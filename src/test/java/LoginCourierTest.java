@@ -1,73 +1,70 @@
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import model.Courier;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
-@RunWith(Parameterized.class)
+//Не получается красиво параметризированный тест на все варианты логина написать
 public class LoginCourierTest {
-    private final String login, password, expectedMessage;
-    private final int expectedAnswerCode;
+
+    private Courier courier;
 
     @Before
     public void setUp(){
-
-    }
-
-
-    public LoginCourierTest(String login, String password, String expectedMessage, int expectedAnswerCode) {
-        this.login = login;
-        this.password = password;
-        this.expectedMessage = expectedMessage;
-        this.expectedAnswerCode = expectedAnswerCode;
-    }
-
-    @Parameterized.Parameters
-    public static Object[][] creationData() {
-        //Этот курьер создан вручную через постман.
-        return new Object[][] {
-                {"Gotharcher", "12345", "", 200},
-                {"Gotharcher", "00000", "Учетная запись не найдена", 404},
-                {"Gotharcher", "", "Недостаточно данных для входа", 400},
-                {"", "12345", "Недостаточно данных для входа", 400}
-        };
+        CourierRequests.init();
+        courier = Courier.createRandomCourier();
+        CourierRequests.createCourier(courier);
     }
 
     @Test
-    public void loginVarianceTest(){
-        Courier courier = new Courier(this.login, this.password);
-        Response response = CourierRequests.initAndLogin(courier);
-        int responseCode = checkAnswerCode(response);
-        if(responseCode == 400 || responseCode == 404) {
-            checkAnswerCodeMessage(response);
-        } else if (responseCode == 200) {
-            checkIDISPresentInAnswer(response);
-        }
+    public void checkSuccessfulLogin(){
+        Response response = CourierRequests.loginCourier(courier);
+        response.then().statusCode(200);
+        checkIDISPresentInAnswer(response);
     }
 
-    @Step("Check answer code in acceptable range")
-    public int checkAnswerCode(Response response){
-        int responseCode = response.then().extract().statusCode();
-        Assert.assertEquals("Получен ожидаемый код ответа", expectedAnswerCode, responseCode);
-        return responseCode;
+    @Test
+    public void checkWrongPasswordLogin(){
+        String oldPassword = courier.getPassword();
+        courier.setPassword("00000");
+        statusCodeAndMessageCorrect(404, "Учетная запись не найдена");
+        courier.setPassword(oldPassword);
     }
 
-    @Step("If answer code accepted but not OK, check for message")
-    public void checkAnswerCodeMessage(Response response){
-        response
-                .then()
-                .assertThat()
-                .body("message", equalTo(expectedMessage));
+    @Test
+    public void checkEmptyLoginLogin(){
+        String oldLogin = courier.getLogin();
+        courier.setLogin("");
+        statusCodeAndMessageCorrect(400, "Недостаточно данных для входа");
+        courier.setLogin(oldLogin);
+    }
+
+    @Test
+    public void checkEmptyPasswordLogin(){
+        String oldPassword = courier.getPassword();
+        courier.setPassword("");
+        statusCodeAndMessageCorrect(400, "Недостаточно данных для входа");
+        courier.setPassword(oldPassword);
+    }
+
+    @Step("Check error code and message with broken credentials")
+    public void statusCodeAndMessageCorrect(int expectedCode, String expectedMessage){
+        Response response = CourierRequests.loginCourier(courier);
+        response.then().statusCode(expectedCode);
+        Assert.assertEquals("Текст в ответе совпадает с указанным", expectedMessage, response.path("message"));
+
     }
 
     @Step("If login successful, ID is returned in answer")
     public void checkIDISPresentInAnswer(Response response){
         int answer = response.then().extract().path("id");
-        Assert.assertNotEquals("Какой-то ID вернулся", 0, answer);
+        Assert.assertNotEquals("Какой-то ID должен вернуться, если курьер залогинен", 0, answer);
+    }
+
+    @After
+    public void tearDown(){
+        CourierRequests.deleteCourier(CourierRequests.getCourierID(courier));
     }
 }

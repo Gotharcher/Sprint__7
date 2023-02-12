@@ -1,10 +1,6 @@
 package model;
 
-import io.restassured.response.Response;
-
 import java.util.List;
-
-import static io.restassured.RestAssured.given;
 
 public class Order {
     private String firstName, lastName, address, metroStation, phone, deliveryDate, comment;
