@@ -1,7 +1,6 @@
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import model.Order;
-import model.OrderResponseCarrier;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +12,7 @@ import static io.restassured.RestAssured.given;
 
 public class GetOrderByNumberTest {
     @Before
-    public void setUp() throws Exception {
+    public void setUp(){
         OrderRequests.init();
     }
 

@@ -12,7 +12,7 @@ public class DeleteCourierTest {
     Courier courier;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp(){
         CourierRequests.init();
         courier = new Courier("Gotharcherdelete", "12345", "Deleteme");
     }

@@ -12,7 +12,7 @@ import java.util.List;
 @RunWith(Parameterized.class)
 public class CreateOrderTest {
     @Before
-    public void setUp() throws Exception {
+    public void setUp(){
         OrderRequests.init();
     }
 

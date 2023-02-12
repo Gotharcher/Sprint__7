@@ -2,6 +2,7 @@ import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import model.Courier;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -13,7 +14,11 @@ public class LoginCourierTest {
     private final String login, password, expectedMessage;
     private final int expectedAnswerCode;
 
-    private int createdID;
+    @Before
+    public void setUp(){
+
+    }
+
 
     public LoginCourierTest(String login, String password, String expectedMessage, int expectedAnswerCode) {
         this.login = login;

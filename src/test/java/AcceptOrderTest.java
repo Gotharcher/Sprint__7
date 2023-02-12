@@ -14,7 +14,7 @@ public class AcceptOrderTest {
     int courierID, orderID;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp(){
         OrderRequests.init();
         Courier courier = Courier.createRandomCourier();
         CourierRequests.createCourier(courier);
@@ -71,7 +71,7 @@ public class AcceptOrderTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown(){
         CourierRequests.deleteCourier(courierID);
     }
 }
