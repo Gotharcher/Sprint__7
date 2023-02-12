@@ -53,6 +53,8 @@ public class CreateCourierTest {
         Assert.assertEquals("Получили код ошибки", 400, response.then().extract().statusCode());
     }
 
+    //В документации поле не указано, как "небязательное". Но поведение ошибки не описано.
+    //Наставник сказал, этот пункт ревью пропустить.
     @Test
     public void createWithoutFirstName(){
         Courier badCourier = new Courier(login, password, "");
