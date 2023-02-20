@@ -36,7 +36,7 @@ public class CourierRequests {
         Courier courier = new Courier(courierID);
         return deleteCourier(courier);
     }
-
+//привет hello
     public static Response initAndDelete(Courier courier){
         init();
         return deleteCourier(courier);
